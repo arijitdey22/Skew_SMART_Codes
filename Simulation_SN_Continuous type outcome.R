@@ -5,7 +5,10 @@ library(moments)              #for skewness of a sample
 ######=========================================================================================================
 ######=========================================================================================================
 
-#rm(list = ls())
+rm(list = ls())
+
+###------------------------------
+###calculating sample sizes
 
 samp.size.set1.sn <- function(gam.a, psi, nu.a, alpha = 0.05)
 {
@@ -13,6 +16,9 @@ samp.size.set1.sn <- function(gam.a, psi, nu.a, alpha = 0.05)
   ret <- (4 - 2*gam.a) * qnorm(alpha/2)^2 * (1 - 2*xi.a^2 / pi) / psi^2
   return(ceiling(ret))
 }
+
+###------------------------------
+###drawing random samples from truncated skew-normal distribution
 
 r.trun.sn <- function(n, mu, sigma, lambda, lower, upper)   #requires sn package
 {
@@ -37,6 +43,8 @@ r.trun.sn <- function(n, mu, sigma, lambda, lower, upper)   #requires sn package
   return(samp)
 }
 
+###------------------------------
+###estimating the parameters of a skew-normal distribution
 par.estimate.sn <- function(vec)
 {
   skw <- min(0.99, abs(skewness(vec)))
@@ -60,17 +68,19 @@ par.estimate.sn <- function(vec)
   return(ret)
 }
 
+#============================================================
+#the main function
 
 cont.set1.sn <- function(psi, gam.a, nu.a, rep = 3e3, alpha = 0.05, pi.a = 0.5, pi.f = 0.5)
 {
   
   count <- 0                                #count for effective loops (that are not terminated by 'next')
-  CP.del1.a <- numeric()                    #.a represents all i.e. all the reps
-  psi.cap.del1.a <- numeric()
+  CP.del.a <- numeric()                    #.a represents all i.e. all the reps
+  psi.cap.del.a <- numeric()
   
   #1
-  #N = samp.size.set1.sn(gam.a, psi, nu.a)
-  N = 1e3
+  N = samp.size.set1.sn(gam.a, psi, nu.a)
+  #N = 1e3
   
   for (i in 1:rep)
   {
@@ -78,9 +88,7 @@ cont.set1.sn <- function(psi, gam.a, nu.a, rep = 3e3, alpha = 0.05, pi.a = 0.5, 
     #2
     mu.l.a <- runif(1, 0.1, 5)
     sigma.l.a <- runif(1, 0.1,5)
-    #~~~~~~~~~~~~~~~~~~
     nu.l.a <- runif(1, 0.1,5)
-    #~~~~~~~~~~~~~~~~~~
     
     ita <- mu.l.a + sigma.l.a * qsn((1 - gam.a), 0, 1, nu.l.a)
     
@@ -146,35 +154,34 @@ cont.set1.sn <- function(psi, gam.a, nu.a, rep = 3e3, alpha = 0.05, pi.a = 0.5, 
     mu.a.NR.f <- 0.1 + log(2) * mu.l.a + 0.5 * mu.l.a.NR
     
     #8
-    mu.d1 <- gam.a * mu.a.R + (1-gam.a)*mu.a.NR.f
+    mu.d1 <- gam.a * mu.a.R + (1-gam.a) * mu.a.NR.f
     
-    del1 <- mu.d1
+    del <- mu.d1
     
     #9
     sigma.d1 <- runif(1, 1, 10)
-    #~~~~~~~~~~~~~~~~~~
-    nu.d1 <- runif(1, 1, 10)
-    #~~~~~~~~~~~~~~~~~~
+    nu.d1 <- runif(1, 0, 10)
     
     Y.a.R <- as.numeric(rsn(N.a.R, mu.a.R, sigma.d1, nu.d1))
     Y.a.NR.f <- as.numeric(rsn(N.a.NR.f, mu.a.NR.f, sigma.d1, nu.d1))
     
     #10
     Y.bar.d1 <- (sum(2* Y.a.R) + sum(4 * Y.a.NR.f)) / (2*length(Y.a.R) + 4*length(Y.a.NR.f))
-    #~~~~~~~~~~~~~~~~~~
-    var.cap.Y.bar.d1 <- (sum(4 * (Y.a.R - Y.bar.d1)^2) + sum(16 * (Y.a.NR.f - Y.bar.d1)^2))  / N^2
-    #xi.d1 <- nu.d1 / sqrt(1+nu.d1^2)
-    #var.cap.Y.bar.d1 <- ((sum(4 * (Y.a.R - Y.bar.d1)^2) + sum(16 * (Y.a.NR.f - Y.bar.d1)^2))  / N^2) * (1 - 2*xi.d1^2 / pi)
-    #~~~~~~~~~~~~~~~~~~
+    #del.cap <- Y.bar.d1
+    del.cap <- Y.bar.d1 - sigma.d1 * sqrt(2/pi) * ( nu.d1 / sqrt(1 + nu.d1^2) )
+    
     
     #11
-    del1.cap <- Y.bar.d1
-    w1.cap <- qnorm(1 - alpha / 2) * sqrt(var.cap.Y.bar.d1)
+    var.cap.del.cap <- (sum(4 * (Y.a.R - Y.bar.d1)^2) + sum(16 * (Y.a.NR.f - Y.bar.d1)^2))  / N^2
+    #xi.d1 <- nu.d1 / sqrt(1+nu.d1^2)
+    #var.cap.del.cap <- ((sum(4 * (Y.a.R - Y.bar.d1)^2) + sum(16 * (Y.a.NR.f - Y.bar.d1)^2))  / N^2) * (1 - 2*xi.d1^2 / pi)^2
+    
+    w.cap <- qnorm(1 - alpha / 2) * sqrt(var.cap.del.cap)
     
     #---------------------
     
-    CP.del1.a <- c(CP.del1.a, ((del1 <= del1.cap + w1.cap) & (del1 >= del1.cap - w1.cap)))
-    psi.cap.del1.a <- c(psi.cap.del1.a, (w1.cap / sigma.d1))
+    CP.del.a <- c(CP.del.a, ((del <= del.cap + w.cap) & (del >= del.cap - w.cap)))
+    psi.cap.del.a <- c(psi.cap.del.a, (w.cap / sigma.d1))
     
     if ((i %% 1000 == 0) & (i < rep))
     {
@@ -185,26 +192,27 @@ cont.set1.sn <- function(psi, gam.a, nu.a, rep = 3e3, alpha = 0.05, pi.a = 0.5, 
   }
   
   print(paste0("We just finished ", rep/1000, "k steps."))
-  ret <- list(Coverage_Prob = mean(CP.del1.a), pis_hat = mean(psi.cap.del1.a), Effective_loops = count)
   
+  ret <- list(Coverage_Prob = mean(na.omit(CP.del.a)), pis_hat = mean(na.omit(psi.cap.del.a)), Effective_loops = count)
   return(ret)
 }
 
+cont.set1.sn(psi = 0.3, gam.a = 0.35, nu.a = 0.5)
+cont.set1.sn(psi = 0.5, gam.a = 0.35, nu.a = 0.5)
+cont.set1.sn(psi = 0.8, gam.a = 0.35, nu.a = 0.5)
 
-#cont.set1.sn(psi, gam.a, nu.a)
+cont.set1.sn(psi = 0.3, gam.a = 0.5, nu.a = 0.5)
+cont.set1.sn(psi = 0.5, gam.a = 0.5, nu.a = 0.5)
+cont.set1.sn(psi = 0.8, gam.a = 0.5, nu.a = 0.5)
 
-cont.set1.sn(0.35, 0.35, 0.35)
-cont.set1.sn(0.5, 0.35, 0.35)
-cont.set1.sn(0.8, 0.35, 0.35)
-
-cont.set1.sn(0.35, 0.35, 0.65)
-cont.set1.sn(0.5, 0.35, 0.65)
-cont.set1.sn(0.8, 0.35, 0.65)
-
-
-a
+cont.set1.sn(psi = 0.3, gam.a = 0.65, nu.a = 0.5)
+cont.set1.sn(psi = 0.5, gam.a = 0.65, nu.a = 0.5)
+cont.set1.sn(psi = 0.8, gam.a = 0.65, nu.a = 0.5)
 
 
+stopping_line
+
+###=========================================================================================================
 
 
 
