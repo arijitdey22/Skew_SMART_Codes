@@ -227,9 +227,6 @@ sim.fun.prec.set.2 <- function(psi, gam.11, gam.12, nu.d1, r1 = 1, r2 = 1,
   return(ret)
 }
 
-sim.fun.prec.set.2(0.4, 0.35, 0.5, 10)
-
-
 #===============================================================================
 #tabulating values
 
