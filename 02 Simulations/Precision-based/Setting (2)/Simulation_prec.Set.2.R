@@ -57,7 +57,7 @@ nu.2 <- function(nu.1, r.3){
 #the main function
 
 sim.fun.prec.set.2 <- function(psi, gam.11, gam.12, nu.d1, r1 = 1, r2 = 1,
-                         rep = 3e3, N = NA, alpha = 0.05, pi.11 = 0.5, pi.22 = 0.5)
+                         rep = 5e3, N = NA, alpha = 0.05, pi.11 = 0.5, pi.22 = 0.5)
 {
   
   count <- 0                              
@@ -233,7 +233,7 @@ sim.fun.prec.set.2 <- function(psi, gam.11, gam.12, nu.d1, r1 = 1, r2 = 1,
 # psi.vec <- c(0.3, 0.4, 0.5)
 # gam.11.vec <- c(0.35, 0.5, 0.65)
 # gam.12.vec <- c(0.35, 0.5, 0.65)
-# nu.d1.vec <- c(-25, -10, -5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 5, 10, 25)
+# nu.d1.vec <- c(-25, -10, -5, -2.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 2.5, 5, 10, 25)
 # 
 # store.cov_prob <- array(dim = c(length(psi.vec),length(gam.11.vec),length(nu.d1.vec)))
 # store.psi_hat <- array(dim = c(length(psi.vec),length(gam.11.vec),length(nu.d1.vec)))
@@ -246,7 +246,7 @@ sim.fun.prec.set.2 <- function(psi, gam.11, gam.12, nu.d1, r1 = 1, r2 = 1,
 #     for (i.nu.d1 in 1:length(nu.d1.vec))
 #     {
 #       foo <- sim.fun.prec.set.2(psi.vec[i.psi], gam.11.vec[i.gam],
-#                           gam.12.vec[i.gam], nu.d1.vec[i.nu.d1], rep = 1500)
+#                           gam.12.vec[i.gam], nu.d1.vec[i.nu.d1])
 #       
 #       store.cov_prob[i.psi, i.gam, i.nu.d1] <- foo$Coverage_Prob
 #       store.psi_hat[i.psi, i.gam, i.nu.d1] <- foo$pis_hat
@@ -271,7 +271,7 @@ library(doParallel)
 psi.vec <- c(0.3, 0.4, 0.5)
 gam.11.vec <- c(0.35, 0.5, 0.65)
 gam.12.vec <- c(0.35, 0.5, 0.65)
-nu.d1.vec <- c(-25, -10, -5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 5, 10, 25)
+nu.d1.vec <- c(-25, -10, -5, -2.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 2.5, 5, 10, 25)
 
 num_cores <- 13
 
@@ -292,7 +292,7 @@ parallel_function<- function(i.nu.d1) {
     for (i.gam in 1:length(gam.11.vec))
     {
       foo <- sim.fun.prec.set.2(psi.vec[i.psi], gam.11.vec[i.gam],
-                          gam.12.vec[i.gam], nu.d1.vec[i.nu.d1], rep = 1500)
+                          gam.12.vec[i.gam], nu.d1.vec[i.nu.d1])
       
       mat.cur.cov_prob[i.psi, i.gam] <- foo$Coverage_Prob
       mat.cur.psi_hat[i.psi, i.gam] <- foo$pis_hat
@@ -345,13 +345,17 @@ plot(density(as.vector(store.cov_prob)),
 store.psi_hat
 #(other visualizations are in different R file)
 
+#-- -- -- -- -- 
+#cov.prop
+quantile(as.vector(store.cov_prob), c(0.025, 0.975))
+
 ####================================================================
 # For tabulation in latex
 
 n.nu <- dim(store.cov_prob)[3]
 
 mat.latex <- matrix(0, ncol = 28, nrow = n.nu)
-mat.latex[,1] <- c(-25, -10, -5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 5, 10, 25)
+mat.latex[,1] <- c(-25, -10, -5, -2.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 2.5, 5, 10, 25)
 
 for (i in 1:n.nu) {
   foo.mat <- matrix(0, ncol = 9, nrow = 3)

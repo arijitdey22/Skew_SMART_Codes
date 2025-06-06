@@ -55,7 +55,7 @@ nu.2 <- function(nu.1, r){
 #the main function
 
 sim.fun.pow.set.2 <- function(gam.11, gam.12, nu.d1, eff.size, pow = 0.8, alpha = 0.05,
-                         r1 = 1, r2 = 1, rep = 3e3, N = NA, pi.11 = 0.5, pi.22 = 0.5)
+                         r1 = 1, r2 = 1, rep = 5e3, N = NA, pi.11 = 0.5, pi.22 = 0.5)
 {
   
   count <- 0                              
@@ -207,7 +207,7 @@ sim.fun.pow.set.2 <- function(gam.11, gam.12, nu.d1, eff.size, pow = 0.8, alpha 
 ##evaluating the function
 
 gam.1a.vec <- c(0.35, 0.5, 0.65)
-nu.d1.vec <- c(-25, -10, -5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 5, 10, 25)
+nu.d1.vec <- c(-25, -10, -5, -2.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 2.5, 5, 10, 25)
 eff.size.vec <- c(0.15, 0.2, 0.25)
 
 n.gam <- length(gam.1a.vec)
@@ -235,15 +235,39 @@ for (i.gam in 1:n.gam){
 save(store.pow, store.samp, store.eff, file = "Simulation_pow.Set.2.Rdata")
 
 ####================================================================
-# For tabulation in latex
 
 rm(list = ls())
 load("Simulation_pow.Set.2.Rdata")
 
+#-- -- -- -- -- 
+
+#coverage probability
+plot(density(as.vector(store.pow)),
+     main = "Density of the Estimated Power",
+     ylab = "Density",
+     xlab = expression(1-beta))
+
+#-- -- -- -- --      
+
+#sample_size:
+#(Done in a different R file)
+
+#-- -- -- -- -- 
+#pow
+store.pow
+#(other visualizations are in different R file)
+
+#-- -- -- -- -- 
+#cov.prop
+quantile(as.vector(store.pow), c(0.025, 0.975))
+
+####================================================================
+# For tabulation in latex
+
 n.nu <- dim(store.pow)[2]
 
 mat.latex <- matrix(0, ncol = 19, nrow = n.nu)
-mat.latex[,1] <- c(-25, -10, -5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 5, 10, 25)
+mat.latex[,1] <- c(-25, -10, -5, -2.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 2.5, 5, 10, 25)
 
 for (i in 1:n.nu) {
   foo.mat <- matrix(0, ncol = 9, nrow = 2)

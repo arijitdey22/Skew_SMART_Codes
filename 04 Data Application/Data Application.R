@@ -20,7 +20,7 @@ samp.size.prec.s1 <- function(gam.11, psi.d1, nu.d1, alpha = 0.05)
 }
 
 psi.vec <- c(0.3, 0.4, 0.5)
-gam.11.vec <- c(0.35, 0.5, 0.65)
+gam.11.vec <- c(0.35, 0.4, 0.65)
 
 store.n.prec.s1 <- matrix(0, nrow = length(psi.vec), ncol = length(gam.11.vec))
 
@@ -38,7 +38,7 @@ for (i.psi in 1:length(psi.vec))
 }
 
 store.n.prec.s1 <- as.data.frame(store.n.prec.s1)
-colnames(store.n.prec.s1) <- c("gam.35", "gam.5", "gam.65")
+colnames(store.n.prec.s1) <- c("gam.35", "gam.4", "gam.65")
 rownames(store.n.prec.s1) <- c("psi.3", "psi.4", "psi.5")
 store.n.prec.s1
 
@@ -56,7 +56,7 @@ samp.size.prec.s2 <- function(gam.11, gam.12, psi.d1, nu.d1, r1 = 1, r2 = 1, alp
 }
 
 psi.vec <- c(0.3, 0.4, 0.5)
-gam.vec <- c(0.35, 0.5, 0.65)
+gam.vec <- c(0.35, 0.4, 0.65)
 
 store.n.prec.s2 <- matrix(0, nrow = length(psi.vec), ncol = length(gam.vec))
 
@@ -75,7 +75,7 @@ for (i.psi in 1:length(psi.vec))
 }
 
 store.n.prec.s2 <- as.data.frame(store.n.prec.s2)
-colnames(store.n.prec.s2) <- c("gam.35", "gam.5", "gam.65")
+colnames(store.n.prec.s2) <- c("gam.35", "gam.4", "gam.65")
 rownames(store.n.prec.s2) <- c("psi.3", "psi.4", "psi.5")
 store.n.prec.s2
 
@@ -92,7 +92,7 @@ samp.size.pow.s2 <- function(gam.11 = 0.35, gam.12 = 0.35, nu.d1 = 1, eff.size =
 }
 
 eff.vec <- c(0.15, 0.2, 0.25)
-gam.vec <- c(0.35, 0.5, 0.65)
+gam.vec <- c(0.35, 0.4, 0.65)
 
 store.n.pow <- matrix(0, nrow = length(eff.vec), ncol = length(gam.vec))
 
@@ -111,7 +111,7 @@ for (i.eff in 1:length(eff.vec))
 }
 
 store.n.pow <- as.data.frame(store.n.pow)
-colnames(store.n.pow) <- c("gam.35", "gam.5", "gam.65")
+colnames(store.n.pow) <- c("gam.35", "gam.4", "gam.65")
 rownames(store.n.pow) <- c("eff.15", "eff.2", "eff.25")
 
 ## ============================================================================
