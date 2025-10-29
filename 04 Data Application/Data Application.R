@@ -5,7 +5,7 @@ library(fGarch)
 data <- read.csv("obj2_weight_difference.csv")
 wgt <- na.omit(data$weight_difference_kg)
 
-nu <- snormFit(wgt)$par[3]
+nu <- round(snormFit(wgt)$par[3],2)
 
 ## ============================================================================
 ## Precision Based Setting (1)
@@ -23,6 +23,7 @@ psi.vec <- c(0.3, 0.4, 0.5)
 gam.11.vec <- c(0.35, 0.4, 0.65)
 
 store.n.prec.s1 <- matrix(0, nrow = length(psi.vec), ncol = length(gam.11.vec))
+store.n.prec.s1.ws <- matrix(0, nrow = length(psi.vec), ncol = length(gam.11.vec))
 
 for (i.psi in 1:length(psi.vec))
 {
@@ -34,12 +35,13 @@ for (i.psi in 1:length(psi.vec))
     #-- - -- --
     
     store.n.prec.s1[i.psi, i.gam] <- samp.size.prec.s1(gam.11, psi, nu)
+    store.n.prec.s1.ws[i.psi, i.gam] <- samp.size.prec.s1(gam.11, psi, 0)
   }
 }
 
 store.n.prec.s1 <- as.data.frame(store.n.prec.s1)
-colnames(store.n.prec.s1) <- c("gam.35", "gam.4", "gam.65")
-rownames(store.n.prec.s1) <- c("psi.3", "psi.4", "psi.5")
+colnames(store.n.prec.s1.ws) <- colnames(store.n.prec.s1) <- c("gam.35", "gam.4", "gam.65")
+rownames(store.n.prec.s1.ws) <- rownames(store.n.prec.s1) <- c("psi.3", "psi.4", "psi.5")
 store.n.prec.s1
 
 ## ============================================================================
@@ -59,6 +61,7 @@ psi.vec <- c(0.3, 0.4, 0.5)
 gam.vec <- c(0.35, 0.4, 0.65)
 
 store.n.prec.s2 <- matrix(0, nrow = length(psi.vec), ncol = length(gam.vec))
+store.n.prec.s2.ws <- matrix(0, nrow = length(psi.vec), ncol = length(gam.vec))
 
 for (i.psi in 1:length(psi.vec))
 {
@@ -71,12 +74,13 @@ for (i.psi in 1:length(psi.vec))
     #-- - -- --
     
     store.n.prec.s2[i.psi, i.gam] <- samp.size.prec.s2(gam.11, gam.12, psi, nu)
+    store.n.prec.s2.ws[i.psi, i.gam] <- samp.size.prec.s2(gam.11, gam.12, psi, 0)
   }
 }
 
 store.n.prec.s2 <- as.data.frame(store.n.prec.s2)
-colnames(store.n.prec.s2) <- c("gam.35", "gam.4", "gam.65")
-rownames(store.n.prec.s2) <- c("psi.3", "psi.4", "psi.5")
+colnames(store.n.prec.s2.ws) <- colnames(store.n.prec.s2) <- c("gam.35", "gam.4", "gam.65")
+rownames(store.n.prec.s2.ws) <- rownames(store.n.prec.s2) <- c("psi.3", "psi.4", "psi.5")
 store.n.prec.s2
 
 ## ============================================================================
@@ -95,6 +99,7 @@ eff.vec <- c(0.15, 0.2, 0.25)
 gam.vec <- c(0.35, 0.4, 0.65)
 
 store.n.pow <- matrix(0, nrow = length(eff.vec), ncol = length(gam.vec))
+store.n.pow.ws <- matrix(0, nrow = length(eff.vec), ncol = length(gam.vec))
 
 for (i.eff in 1:length(eff.vec))
 {
@@ -107,16 +112,20 @@ for (i.eff in 1:length(eff.vec))
     #-- - -- --
     
     store.n.pow[i.eff, i.gam] <- samp.size.pow.s2(gam.11, gam.12, nu, eff)
+    store.n.pow.ws[i.eff, i.gam] <- samp.size.pow.s2(gam.11, gam.12, 0, eff)
   }
 }
 
 store.n.pow <- as.data.frame(store.n.pow)
-colnames(store.n.pow) <- c("gam.35", "gam.4", "gam.65")
-rownames(store.n.pow) <- c("eff.15", "eff.2", "eff.25")
+colnames(store.n.pow.ws) <- colnames(store.n.pow) <- c("gam.35", "gam.4", "gam.65")
+rownames(store.n.pow.ws) <- rownames(store.n.pow) <- c("eff.15", "eff.2", "eff.25")
 
 ## ============================================================================
 ## Power Based
 
 store.n.prec.s1
+store.n.prec.s1.ws
 store.n.prec.s2
+store.n.prec.s2.ws
 store.n.pow
+store.n.pow.ws
