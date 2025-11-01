@@ -4,4 +4,4 @@ The sequential multiple assignment randomized trial (SMART) is a study design fo
 * The remaining directories are organized by section and include the scripts necessary to reproduce the analyses and results reported in the manuscript.
 
 If you use these formulas or code, please cite the paper:
-Dey, A., Yan, X., & Chakraborty, B. (2025+). *Sample size calculation of SMART design with a skewed outcome: Application to the SMART+ study*.
+*Dey, A., Yan, X., & Chakraborty, B. (2025+). Sample size calculation of SMART design with a skewed outcome: Application to the SMART+ study*.
