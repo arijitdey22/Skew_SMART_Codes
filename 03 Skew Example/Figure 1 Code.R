@@ -13,7 +13,7 @@ ggplot(df, aes(x = vals, y = freq)) +
   geom_line(color = "dodgerblue4", linewidth = 0.5) +
   geom_point(color = "white", size = 4, shape = 21, fill = "white") + 
   geom_point(color = "dodgerblue4", size = 2, shape = 1) + 
-  labs(x = "Weight difference (kgs)",
+  labs(x = "Weight change (kg)",
     y = "Frequency") +
   theme_minimal() +
   theme(axis.title = element_text(size = 12),
