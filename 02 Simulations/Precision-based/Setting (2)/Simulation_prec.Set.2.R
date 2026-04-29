@@ -57,7 +57,7 @@ nu.2 <- function(nu.1, r.3){
 #the main function
 
 sim.fun.prec.set.2 <- function(psi, gam.11, gam.12, nu.d1, r1 = 1, r2 = 1,
-                         rep = 5e3, N = NA, alpha = 0.05, pi.11 = 0.5, pi.22 = 0.5)
+                         rep = 1e4, N = NA, alpha = 0.05, pi.11 = 0.5, pi.22 = 0.5)
 {
   
   count <- 0                              
@@ -268,12 +268,12 @@ sim.fun.prec.set.2 <- function(psi, gam.11, gam.12, nu.d1, r1 = 1, r2 = 1,
 library(foreach)
 library(doParallel)
 
-psi.vec <- c(0.3, 0.4, 0.5)
+psi.vec <- c(0.35, 0.5, 0.65)
 gam.11.vec <- c(0.35, 0.5, 0.65)
-gam.12.vec <- c(0.35, 0.5, 0.65)
+gam.12.vec <- c(0.3, 0.55, 0.75)
 nu.d1.vec <- c(-25, -10, -5, -2.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 2.5, 5, 10, 25)
 
-num_cores <- 13
+num_cores <- 20
 
 cl <- makeCluster(num_cores)
 registerDoParallel(cl)

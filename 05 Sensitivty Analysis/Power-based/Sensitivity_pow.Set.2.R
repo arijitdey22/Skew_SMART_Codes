@@ -54,7 +54,7 @@ nu.2 <- function(nu.1, r){
 #===============================================================================
 #the main function
 
-sim.fun.pow.set.2 <- function(gam.11, gam.12, nu.d1, eff.size, pow = 0.8, alpha = 0.05,
+sim.fun.pow.set.2 <- function(gam.11, gam.12, nu.d1, nu.samp, eff.size, pow = 0.8, alpha = 0.05,
                          r1 = 1, r2 = 1, rep = 1e4, N = NA, pi.11 = 0.5, pi.22 = 0.5)
 {
   
@@ -64,7 +64,7 @@ sim.fun.pow.set.2 <- function(gam.11, gam.12, nu.d1, eff.size, pow = 0.8, alpha 
   
   #1------
   
-  if (is.na(N)) {N = samp.size.pow.s2(gam.11, gam.12, nu.d1, eff.size, pow)}
+  if (is.na(N)) {N = samp.size.pow.s2(gam.11, gam.12, nu.samp, eff.size, pow)}
   
   #-------
   
@@ -203,147 +203,31 @@ sim.fun.pow.set.2 <- function(gam.11, gam.12, nu.d1, eff.size, pow = 0.8, alpha 
   
 }
 
-# ##===============================================================================
-# ##evaluating the function
-# 
-# gam.11.vec <- c(0.35, 0.5, 0.65)
-# gam.12.vec <- c(0.3, 0.55, 0.75)
-# nu.d1.vec <- c(-25, -10, -5, -2.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 2.5, 5, 10, 25)
-# eff.size.vec <- c(0.05, 0.15, 0.25)
-# 
-# n.gam <- length(gam.11.vec)
-# n.nu <- length(nu.d1.vec)
-# n.eff <- length(eff.size.vec)
-# 
-# store.n <- store.pow <- store.eff <- array(0, dim = c(n.gam, n.nu, n.eff))
-# 
-# for (i.gam in 1:n.gam){
-#   for (i.nu in 1:n.nu){
-#     for (i.eff in 1:n.eff){
-#       
-#       foo <- sim.fun.pow.set.2(gam.11.vec[i.gam], gam.12.vec[i.gam], nu.d1.vec[i.nu],
-#                           eff.size.vec[i.eff])
-#       store.n[i.gam, i.nu, i.eff] <- foo$Sample_Size
-#       store.pow[i.gam, i.nu, i.eff] <- foo$Power
-#       store.eff[i.gam, i.nu, i.eff] <- foo$Eff.size_hat
-#       
-#       print(paste0("we are at Gam.a = ", i.gam, ", nu.d1 = ", i.nu, ", eff.size = ", i.eff))
-#       
-#     }
-#   }
-# }
-# 
-# save(store.pow, store.n, store.eff, file = "Simulation_pow.Set.2.Rdata")
+#===============================================================================
+#tabulating values
 
-#-------------------------------------------------------------------------------
-# Using parallel core
+eff.size <- 0.15
+gam.11 <- 0.5
+gam.12 <- 0.55
 
-library(foreach)
-library(doParallel)
+nu.vec <- c(1, 5)
+c.nu.vec <- c(0.75, 0.9, 1.1, 1.25)
 
-gam.11.vec <- c(0.35, 0.5, 0.65)
-gam.12.vec <- c(0.3, 0.55, 0.75)
-nu.d1.vec <- c(-25, -10, -5, -2.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 2.5, 5, 10, 25)
-eff.size.vec <- c(0.05, 0.15, 0.25)
+store.pow <- matrix(0, ncol = length(c.nu.vec), nrow = length(nu.vec))
 
-num_cores <- 20
-
-cl <- makeCluster(num_cores)
-registerDoParallel(cl)
-
-parallel_function<- function(i.nu.d1) {
-  
-  library(sn)
-  library(fGarch)
-  
-  mat.cur.eff <- matrix(0, ncol = length(gam.11.vec), nrow = length(eff.size.vec))
-  mat.cur.pow <- matrix(0, ncol = length(gam.11.vec), nrow = length(eff.size.vec))
-  mat.cur.n <- matrix(0, ncol = length(gam.11.vec), nrow = length(eff.size.vec))
-  
-  for (i.eff in 1:length(eff.size.vec))
-  {
-    for (i.gam in 1:length(gam.11.vec))
-    {
-      foo <- sim.fun.pow.set.2(gam.11.vec[i.gam], gam.12.vec[i.gam], nu.d1.vec[i.nu.d1],
-                               eff.size.vec[i.eff])
-      
-      mat.cur.eff[i.eff, i.gam] <- foo$Eff.size_hat
-      mat.cur.pow[i.eff, i.gam] <- foo$Power
-      mat.cur.n[i.eff, i.gam] <- foo$Sample_Size
-      
-    }
+for (i.nu in 1:length(nu.vec)){
+  for (i.c.nu in 1:length(c.nu.vec)){
+    nu.true <- nu.vec[i.nu]
+    nu.samp <- nu.true * c.nu.vec[i.c.nu]
+    foo <- sim.fun.pow.set.2(gam.11, gam.12, nu.true, nu.samp, eff.size)
+    
+    store.pow[i.nu, i.c.nu] <- foo$Power
   }
-  
-  list.out <- list(mat.cur.eff, mat.cur.pow, mat.cur.n)
-  return(list.out)
-  
 }
 
-list.nu.d1 <- foreach(i.nu.d1 = 1:length(nu.d1.vec)) %dopar% {
-  parallel_function(i.nu.d1)
-}
+store.pow <- as.table(store.pow)
+colnames(store.pow) <- c("c.nu = 0.75", "c.nu = 0.9", "c.nu = 1.1", "c.nu = 1.25")
+rownames(store.pow) <- c("nu = 1", "nu = 5")
+(store.pow <- round(store.pow, 3))
 
-stopCluster(cl)
-
-store.n <- store.pow <- store.eff <- array(dim = c(length(eff.size.vec), length(gam.11.vec), length(nu.d1.vec)))
-
-for (i in 1:length(nu.d1.vec)){
-  store.eff[,,i] <- list.nu.d1[[i]][[1]]
-  store.pow[,,i] <- list.nu.d1[[i]][[2]]
-  store.n[,,i] <- list.nu.d1[[i]][[3]]
-}
-
-save(store.eff, store.pow, store.n, file = "Simulation_pow.Set.2.Rdata")
-
-####================================================================
-
-rm(list = ls())
-load("Simulation_pow.Set.2.Rdata")
-
-#-- -- -- -- -- 
-
-#coverage probability
-plot(density(as.vector(store.pow)),
-     main = "Density of the Estimated Power",
-     ylab = "Density",
-     xlab = expression(1-beta))
-
-#-- -- -- -- --      
-
-#sample_size:
-#(Done in a different R file)
-
-#-- -- -- -- -- 
-#pow
-store.pow
-#(other visualizations are in different R file)
-
-#-- -- -- -- -- 
-#cov.prop
-quantile(as.vector(store.pow), c(0.025, 0.975))
-
-####================================================================
-# For tabulation in latex
-
-n.nu <- dim(store.pow)[3]
-
-mat.latex <- matrix(0, ncol = 19, nrow = n.nu)
-mat.latex[,1] <- c(-25, -10, -5, -2.5, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 2.5, 5, 10, 25)
-
-for (i in 1:n.nu) {
-  foo.mat <- matrix(0, ncol = 9, nrow = 2)
-  
-  foo.mat[1,] <- as.vector(t(store.n[,,i]))
-  foo.mat[2,] <- as.vector(t(store.pow[,,i]))
-  
-  mat.latex[i,2:19] <- as.vector(foo.mat)
-}
-
-mat.latex <- round(mat.latex, 3)
-
-df.latex <- as.data.frame(mat.latex)
-
-df.upper <- df.latex[,1:9]
-df.lower <- df.latex[,10:19]
-
-# Now use chatgpt to get the latex code
+save(store.pow, file = "Sensitivity_pow.Set.2.Rdata")

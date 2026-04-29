@@ -16,7 +16,7 @@ df.3 <- as.data.frame(mat.all[,c(1,4,7,10)])
 df.4 <- as.data.frame(mat.all[,c(2,5,8,10)])
 df.5 <- as.data.frame(mat.all[,c(3,6,9,10)])
 
-colnames(df.5)  <- colnames(df.4)  <- colnames(df.3) <- c("0.35", "0.5", "0.65", "nu.d1")
+colnames(df.5)  <- colnames(df.4)  <- colnames(df.3) <- c("(0.35,0.3)", "(0.5,0.55)", "(0.65,0.75)", "nu.d1")
 
 p1 <- df.3 |> 
   pivot_longer(cols = !nu.d1, names_to = "gamma", values_to = "pow.hat") |>
@@ -24,7 +24,7 @@ p1 <- df.3 |>
   geom_line(aes(x = nu.d1, y = pow.hat, lty = gamma)) +
   labs(x = TeX(r"($\nu_{d_1}$)"),
        y = TeX(r"($1-\hat{\beta}$)"),
-       lty = TeX(r"($\gamma_{11} = \gamma_{12}$       )")) +
+       lty = TeX(r"($(\gamma_{11}, \gamma_{12})$  )")) +
   theme(axis.text = element_text(size = 11),
         axis.title = element_text(size = 13),
         axis.title.y = element_text(margin = margin(r = 10)),
@@ -40,7 +40,7 @@ p2 <- df.4 |>
   geom_line(aes(x = nu.d1, y = pow.hat, lty = gamma)) +
   labs(x = TeX(r"($\nu_{d_1}$)"),
        y = TeX(r"($1-\hat{\beta}$)"),
-       lty = TeX(r"($\gamma_{11} = \gamma_{12}$       )")) +
+       lty = TeX(r"($(\gamma_{11}, \gamma_{12})$  )")) +
   theme(axis.text = element_text(size = 11),
         axis.title = element_text(size = 13),
         axis.title.y = element_text(margin = margin(r = 10)),
@@ -56,7 +56,7 @@ p3 <- df.5 |>
   geom_line(aes(x = nu.d1, y = pow.hat, lty = gamma)) +
   labs(x = TeX(r"($\nu_{d_1}$)"),
        y = TeX(r"($1-\hat{\beta}$)"),
-       lty = TeX(r"($\gamma_{11} = \gamma_{12}$       )")) +
+       lty = TeX(r"($(\gamma_{11}, \gamma_{12})$  )")) +
   theme(axis.text = element_text(size = 11),
         axis.title = element_text(size = 13),
         axis.title.y = element_text(margin = margin(r = 10)),
